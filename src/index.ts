@@ -16,7 +16,8 @@ if (process.argv[2]) {
     // Perform the operations to attempt to read/open a file
     const viewer = new Viewer(process.argv[2]);
     console.log(`\nLoading file: ${process.argv[2]}...`);
+    viewer.start();
 } else {
     console.log('\n\nPlease provide a file to read.');
-    console.log('\n\nUsage: tview [file name or path]')
+    console.log('\n\nUsage: tview [file name or path]');
 }
