@@ -1,0 +1,23 @@
+{
+  "name": "tview",
+  "version": "0.0.1",
+  "description": "Basic text viewer for CLI",
+  "main": "index.js",
+  "dependencies": {
+    "blessed": "^0.1.81"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "npx test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LilithTundrus/ts-viewer.git"
+  },
+  "author": "Lilith Tundrus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LilithTundrus/ts-viewer/issues"
+  },
+  "homepage": "https://github.com/LilithTundrus/ts-viewer#readme"
+}
