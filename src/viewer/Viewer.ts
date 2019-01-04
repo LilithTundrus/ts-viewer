@@ -5,9 +5,10 @@
 import * as blessed from 'blessed';
 import * as fs from 'fs';
 import * as path from 'path';
-
 // Local dependencies
 import { viewerState } from '../interfaces';
+import TextArea from './ui-components/TextArea';
+
 
 export default class Viewer {
 
@@ -39,6 +40,12 @@ export default class Viewer {
         // Used, but often doesn't work in windows
         cursor: this.cursorOptions
     });
+
+    // This is the viewer's instance of the textArea class
+    textArea: TextArea;
+    // This is the viewer's instance of the statusBar class
+    // statusBar: StatusBar;
+
 
     /** Creates an instance of Viewer.
      * @param {string} filePath
@@ -80,7 +87,7 @@ export default class Viewer {
         try {
             contents = fs.readFileSync(this.state.relativePath);
         }
-        // Else, print an error that the file cannot be opened after starting the editor
+        // Else, print an error that the file cannot be opened after starting the viewer
         catch (err) {
             console.log(`Could not read file ${this.state.relativePath}: ${err}`);
             process.exit(1);
@@ -101,21 +108,21 @@ export default class Viewer {
         this.screen.title = `TVIEW - ${this.state.resolvedFilePath}`;
 
         // Initialize all classes needed to construct the base UI
-        // this.textArea = new TextArea(this, parsedContent);
+        this.textArea = new TextArea(this, parsedContent);
         // this.statusBar = new StatusBar(this);
 
-        // Set the label of the textArea to indicate what file is being edited
-        // this.textArea.textArea.setLabel(`${this.state.fileName}`);
+        // Set the label of the textArea to indicate what file is being viewed
+        this.textArea.textArea.setLabel(`${this.state.fileName}`);
 
         // Append each UI element to the blessed screen
-        // this.screen.append(this.textArea.textArea);
+        this.screen.append(this.textArea.textArea);
         // this.screen.append(this.statusBar.statusBar);
 
         // Reset the cursor position before rendering the UI
         this.screen.program.getCursor((err, data) => {
             this.screen.program.cursorUp(this.screen.height);
             this.screen.program.cursorBackward(this.screen.width);
-            // Put the cursor at line 1, column 1 of the editing window, including the UI
+            // Put the cursor at line 1, column 1 of the viewing window, including the UI
             this.screen.program.cursorForward(1);
             this.screen.program.cursorDown(2);
         });
@@ -123,8 +130,6 @@ export default class Viewer {
         // Render the screen so all changes are ensured to show up
         this.screen.render();
         // Focus the textArea to start out
-        // this.textArea.textArea.focus();
-
-
+        this.textArea.textArea.focus();
     }
 }

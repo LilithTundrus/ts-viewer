@@ -12,7 +12,6 @@ import { program } from 'blessed';
 // This file contains the class for handling key events for the viewer's class's
 // textArea UI component
 
-
 export default class KeyHandler {
 
     constructor(viewerInstance: Viewer) {
