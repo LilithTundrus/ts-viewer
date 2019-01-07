@@ -6,7 +6,7 @@
 
 
 // Local dependencies
-import Viewer from "./viewer/Viewer";
+import Viewer from './viewer/Viewer';
 
 
 // Main entry point for the viewer, check for an argument, 
