@@ -73,7 +73,6 @@ export default class Viewer {
         this.state.fileName = fileName;
     }
 
-
     start() {
         // First, make sure the path exists from the viewer state
         if (!fs.existsSync(this.state.relativePath)) {
