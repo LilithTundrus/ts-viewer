@@ -1,7 +1,7 @@
 // Using ES6 strict mode (not 100% needed, but ensure that the compiled JS is in strict mode)
 'use strict';
 
-// Node/NPM dependencies
+// Node dependencies
 import * as blessed from 'blessed';
 // Local dependencies
 import Viewer from '../Viewer';
@@ -11,16 +11,20 @@ import KeyHandler from '../KeyHandler';
 // This file contains one of the blessed components for constructing the UI in an effort to
 // keep this project modular
 
-// Create the textArea textbox, where the text being edited will be displayed
+// Create the textArea textbox, where the text being viewed will be displayed
 
 export default class TextArea {
 
-    // The viewerInstance allows us to access features from the Editor class instance to do things
+    // The viewerInstance allows us to access features from the Viewer class instance to do things
     // like change state, etc.
     private viewerInstance: Viewer;
-    private content;
+    private content: any;
+    // The shadowContent will be used to update the actual text of the file
+    // For example, any time a line's content is change, it will first occur
+    // in the shadow content and THEN be visually updated on the screen.
+    shadowContent: string[];
 
-    // Used to store the offset of the horizontal view of the text being edited
+    // Used to store the offset of the horizontal view of the text being viewed
     viewOffSet: number;
     textArea: blessed.Widgets.BoxElement;
 
@@ -133,6 +137,100 @@ export default class TextArea {
             // The content is what text the box should display
             content: this.content,
         });
+
+        // Use the private method to reigster the key listeners for the textArea when focused
+        this.registerKeyListeners();
+
+        // This is the TRUE content of the file being viewed, not effected by the viewing window
+        this.shadowContent = this.textArea.getLines();
     }
 
+
+    /** Register the key listeners for the textArea element
+     * @private
+     * @memberof TextArea
+     */
+    private registerKeyListeners() {
+
+        // Quit on Control-W
+        // TODO: This should be aware of whether or not the editor has a file that isn't saved/etc.
+        this.textArea.key(['C-w'], () => {
+            return process.exit(0);
+        });
+
+        this.textArea.key('left', () => {
+            this.keyHandler.leftArrowHandler();
+        });
+
+        this.textArea.key('right', () => {
+            this.keyHandler.rightArrowHandler();
+        });
+
+        this.textArea.key('up', () => {
+            this.keyHandler.upArrowHandler();
+        });
+
+        this.textArea.key('down', () => {
+            this.keyHandler.downArrowHandler();
+        });
+
+        this.textArea.key('home', () => {
+            // this.keyHandler.homeHandler();
+        });
+
+        this.textArea.key('end', () => {
+            // this.keyHandler.endHandler();
+        });
+
+    }
+
+    // This function ensures that on a vertical scroll, the previous line is still on the right
+    // horizontal view offset
+    reformTextDownArrow() {
+        // Get all currently visible lines as an array
+        let visibleLines = this.getVisibleLines();
+        // Get the next line index to what is currently visible
+        let nextVisibleLineIndex = visibleLines.length + this.internalVerticalOffset;
+
+        // Get the 'true' text of the next line, plus the view offset
+        let trueContent = this.shadowContent[nextVisibleLineIndex].substring(this.viewOffSet);
+        // Set the line to the 'true' content before it is seen
+        this.textArea.setLine(nextVisibleLineIndex, trueContent);
+    }
+
+    /** Return the visible lines of the textArea as an array
+     * @returns
+     * @memberof TextArea
+     */
+    getVisibleLines() {
+        let visibleLines = [];
+        // Relative height of the textArea itself
+        let textAreaRelativeHeight = this.textArea.height - 2;
+        // Offset is just shorthand for the class's vertical offset
+        let offset = this.internalVerticalOffset;
+
+        for (let i = offset; i < textAreaRelativeHeight + offset; i++) {
+            // Push the current line to the temporary array
+            visibleLines.push(this.textArea.getLine(i));
+        }
+        return visibleLines;
+    }
+
+    // Basic function to get the scrolling cursor offset (used frequently for each key handler)
+    calculateScrollingOffset(cursor) {
+        // Get the cursor position relative to the textArea (minus the menubar and the texarea's borders)
+        let cursorYRelative = cursor.y - 3;
+        // Position of the cursor relative to the BOTTOM of the textArea
+        let cursorYFromRelativeBottom = this.textArea.height - cursorYRelative;
+
+        // getscroll() is the LAST line of the textarea
+        // For some the cursor.y relative offset must be removed (add 3)
+        let currentLineScrollOffset = this.textArea.getScroll() - cursorYFromRelativeBottom + 3;
+
+        if (this.textArea.getScroll() == 0) {
+            currentLineScrollOffset = cursorYRelative;
+        }
+
+        return this.verticalScrollOffset;
+    }
 }
