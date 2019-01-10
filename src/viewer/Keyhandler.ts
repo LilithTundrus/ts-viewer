@@ -14,8 +14,12 @@ import { program } from 'blessed';
 
 export default class KeyHandler {
 
-    constructor(viewerInstance: Viewer) {
+    // The viewerInstance allows us to access features from the Editor class instance to do things
+    // like change state, etc.
+    private viewerInstance: Viewer;
 
+    constructor(viewerInstance: Viewer) {
+        this.viewerInstance = viewerInstance;
     }
 
     leftArrowHandler() {
@@ -31,7 +35,18 @@ export default class KeyHandler {
     }
 
     downArrowHandler() {
-
+        // This callback returns an err and data object, the data object has the x/y position 
+        // of the cursor
+        this.viewerInstance.program.getCursor((err: any, cursor: any) => {
+            // This visually keeps the cursor within bottom bound of the editing window,
+            // accounting for the extra the statusbar height
+            if (cursor.y < this.viewerInstance.screen.height - 1) {
+                // If the cursor isn't at the bottom of the textArea, move it down by one
+                this.viewerInstance.program.cursorDown();
+                this.viewerInstance.screen.render();
+                this.viewerInstance.textArea.verticalScrollOffset++;
+            }
+        });
     }
 
     homeHandler() {
