@@ -3,6 +3,7 @@
 
 // NPM dependencies
 import * as blessed from 'blessed';
+// Node dependencies
 import * as fs from 'fs';
 import * as path from 'path';
 // Local dependencies
@@ -129,7 +130,7 @@ export default class Viewer {
 
         // Render the screen so all changes are ensured to show up
         this.screen.render();
-        // Focus the textArea to start out
+        // Focus the textArea to start so that the key listeners for the textarea are used
         this.textArea.textArea.focus();
     }
 }
