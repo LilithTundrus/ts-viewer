@@ -153,7 +153,6 @@ export default class TextArea {
     private registerKeyListeners() {
 
         // Quit on Control-W
-        // TODO: This should be aware of whether or not the editor has a file that isn't saved/etc.
         this.textArea.key(['C-w'], () => {
             return process.exit(0);
         });
@@ -182,6 +181,13 @@ export default class TextArea {
             // this.keyHandler.endHandler();
         });
 
+        this.textArea.key('pageup', () => {
+            // TODO: Handle this key
+        });
+
+        this.textArea.key('pagedown', () => {
+            // TODO: Handle this key
+        });
     }
 
     // This function ensures that on a vertical scroll, the previous line is still on the right
